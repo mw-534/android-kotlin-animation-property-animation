@@ -73,6 +73,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Disable button on start of animation and enable it at the end of the animation
+    // in order to avoid that the user disrupts the animation by restarting it before
+    // it has finished which would cause a "jank".
+    // Adapter is used here so only the callbacks we're interested in have to be overridden.
+    // The rest is stubbed out by the adapter.
+    private fun ObjectAnimator.disableViewDuringAnimation(view: View) {
+        addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationStart(animation: Animator?) {
+                view.isEnabled = false
+            }
+            override fun onAnimationEnd(animation: Animator?) {
+                view.isEnabled = true
+            }
+        })
+    }
+
     private fun rotater() {
         // The reason that the animation starts at -360 is that that allows the star to complete
         // a full circle (360 degrees) and end at 0, which is the default rotation value
@@ -80,23 +96,16 @@ class MainActivity : AppCompatActivity() {
         // (in case any other action occurs on that view later, expecting the default value).
         val animator = ObjectAnimator.ofFloat(star, View.ROTATION, -360f, 0f)
         animator.duration = 1000 // Default is 300 milliseconds
-        // Disable button on start of animation and enable it at the end of the animation
-        // in order to avoid that the user disrupts the animation by restarting it before
-        // it has finished which would cause a "jank".
-        // Adapter is used here so only the callbacks we're interested in have to be overridden.
-        // The rest is stubbed out by the adapter.
-        animator.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationStart(animation: Animator?) {
-                rotateButton.isEnabled = false
-            }
-            override fun onAnimationEnd(animation: Animator?) {
-                rotateButton.isEnabled = true
-            }
-        })
+        animator.disableViewDuringAnimation(rotateButton)
         animator.start()
     }
 
     private fun translater() {
+        val animator = ObjectAnimator.ofFloat(star, View.TRANSLATION_X, 200f)
+        animator.repeatCount = 1
+        animator.repeatMode = ObjectAnimator.REVERSE
+        animator.disableViewDuringAnimation(translateButton)
+        animator.start()
     }
 
     private fun scaler() {
