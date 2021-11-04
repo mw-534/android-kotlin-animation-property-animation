@@ -16,8 +16,12 @@
 
 package com.google.samples.propertyanimation
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 
@@ -70,6 +74,26 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun rotater() {
+        // The reason that the animation starts at -360 is that that allows the star to complete
+        // a full circle (360 degrees) and end at 0, which is the default rotation value
+        // for a non-rotated view, so it’s a good value to have at the end of the animation
+        // (in case any other action occurs on that view later, expecting the default value).
+        val animator = ObjectAnimator.ofFloat(star, View.ROTATION, -360f, 0f)
+        animator.duration = 1000 // Default is 300 milliseconds
+        // Disable button on start of animation and enable it at the end of the animation
+        // in order to avoid that the user disrupts the animation by restarting it before
+        // it has finished which would cause a "jank".
+        // Adapter is used here so only the callbacks we're interested in have to be overridden.
+        // The rest is stubbed out by the adapter.
+        animator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationStart(animation: Animator?) {
+                rotateButton.isEnabled = false
+            }
+            override fun onAnimationEnd(animation: Animator?) {
+                rotateButton.isEnabled = true
+            }
+        })
+        animator.start()
     }
 
     private fun translater() {
