@@ -1,3 +1,6 @@
+Based on this Udacity repository:
+https://github.com/udacity/android-kotlin-animation-property-animation
+
 PropertyAnimation - Final Code
 ============================================================================
 
